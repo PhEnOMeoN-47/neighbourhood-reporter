@@ -49,4 +49,14 @@ router.get("/failure", (req, res) => {
   res.status(401).send("Google authentication failed");
 });
 
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "lax",
+  });
+
+  res.json({ message: "Logged out successfully" });
+});
+
+
 module.exports = router;
