@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
-// ✅ Client-only Map (NO SSR)
+
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
 });
@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Report form state
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Pothole");
@@ -52,6 +52,26 @@ export default function Dashboard() {
     loadDashboard();
   }, []);
 
+
+  function handleUseMyLocation() {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude.toFixed(6));
+        setLongitude(position.coords.longitude.toFixed(6));
+      },
+      (error) => {
+        console.error(error);
+        alert("Unable to fetch your location");
+      }
+    );
+  }
+
+
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
@@ -85,6 +105,42 @@ export default function Dashboard() {
     }
   }
 
+function handleUseMyLocation() {
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      setLatitude(position.coords.latitude.toFixed(6));
+      setLongitude(position.coords.longitude.toFixed(6));
+    },
+    (error) => {
+      console.error("Geolocation error:", error.code, error.message);
+
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("Location permission denied");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is unavailable");
+          break;
+        case error.TIMEOUT:
+          alert("Location request timed out");
+          break;
+        default:
+          alert("Unable to fetch your location");
+      }
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+    }
+  );
+}
+
+
   async function handleLogout() {
     await fetch("http://127.0.0.1:4000/auth/logout", {
       method: "POST",
@@ -109,11 +165,11 @@ export default function Dashboard() {
         Logout
       </button>
 
-      {/* ✅ MAP VIEW */}
+
       <h2>Map View</h2>
       <MapView reports={reports} />
 
-      {/* ✅ REPORT FORM */}
+
       <h2>Report an Issue</h2>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: "30px" }}>
@@ -161,12 +217,23 @@ export default function Dashboard() {
           />
         </div>
 
+
+        <button
+          type="button"
+          onClick={handleUseMyLocation}
+          style={{ marginTop: 8 }}
+        >
+          Use my location
+        </button>
+
+        <br />
+
         <button type="submit" disabled={submitting} style={{ marginTop: 10 }}>
           {submitting ? "Submitting..." : "Submit Report"}
         </button>
       </form>
 
-      {/* ✅ REPORT LIST */}
+
       <h2>Reported Issues</h2>
 
       {reports.length === 0 ? (
