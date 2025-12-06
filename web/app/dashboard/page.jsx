@@ -2,21 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
-// ✅ Leaflet imports
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-
-// ✅ Fix Leaflet marker icons (VERY IMPORTANT)
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+// ✅ Client-only Map (NO SSR)
+const MapView = dynamic(() => import("./MapView"), {
+  ssr: false,
 });
 
 export default function Dashboard() {
@@ -26,7 +16,7 @@ export default function Dashboard() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Form state
+  // Report form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Pothole");
@@ -35,8 +25,6 @@ export default function Dashboard() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-
     async function loadDashboard() {
       try {
         const meRes = await fetch("http://127.0.0.1:4000/me", {
@@ -49,25 +37,21 @@ export default function Dashboard() {
         }
 
         const meData = await meRes.json();
-        if (isMounted) setUser(meData);
+        setUser(meData);
 
         const reportsRes = await fetch("http://127.0.0.1:4000/reports");
         const reportsData = await reportsRes.json();
-        if (isMounted) setReports(reportsData);
+        setReports(reportsData);
       } catch (err) {
         console.error(err);
       } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
     }
 
     loadDashboard();
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
-  // ✅ Create report
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
@@ -101,7 +85,6 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ Logout
   async function handleLogout() {
     await fetch("http://127.0.0.1:4000/auth/logout", {
       method: "POST",
@@ -128,34 +111,7 @@ export default function Dashboard() {
 
       {/* ✅ MAP VIEW */}
       <h2>Map View</h2>
-
-      <MapContainer
-        center={[19.076, 72.8777]}
-        zoom={12}
-        style={{ height: "400px", width: "100%", marginBottom: "30px" }}
-      >
-        <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        {reports
-          .filter((r) => r.latitude && r.longitude)
-          .map((report) => (
-            <Marker
-              key={report.id}
-              position={[report.latitude, report.longitude]}
-            >
-              <Popup>
-                <strong>{report.title}</strong>
-                <br />
-                {report.category}
-                <br />
-                Status: {report.status}
-              </Popup>
-            </Marker>
-          ))}
-      </MapContainer>
+      <MapView reports={reports} />
 
       {/* ✅ REPORT FORM */}
       <h2>Report an Issue</h2>
@@ -210,6 +166,7 @@ export default function Dashboard() {
         </button>
       </form>
 
+      {/* ✅ REPORT LIST */}
       <h2>Reported Issues</h2>
 
       {reports.length === 0 ? (
