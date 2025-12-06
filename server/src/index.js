@@ -21,6 +21,7 @@ app.use(passport.initialize());
 
 require("./utils/passport-google");
 app.use("/auth", require("./routes/auth"));
+app.use("/reports", require("./routes/reports"));
 
 
 function verifyJwt(req, res, next) {
