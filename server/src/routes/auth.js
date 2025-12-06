@@ -1,0 +1,51 @@
+const express = require("express");
+const passport = require("passport");
+const jwt = require("jsonwebtoken");
+
+const router = express.Router();
+
+
+router.get(
+  "/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+    session: false,
+  })
+);
+
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", {
+    session: false,
+    failureRedirect: "/auth/failure",
+  }),
+  (req, res) => {
+
+    const user = req.user;
+
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // localhost only
+      sameSite: "lax",
+    });
+
+
+    return res.redirect(process.env.FRONTEND_URL);
+  }
+);
+
+
+router.get("/failure", (req, res) => {
+  res.status(401).send("Google authentication failed");
+});
+
+module.exports = router;

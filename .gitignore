@@ -22,3 +22,4 @@ out
 # MacOS
 .DS_Store
 
+server/.env
