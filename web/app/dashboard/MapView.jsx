@@ -17,32 +17,55 @@ L.Icon.Default.mergeOptions({
 
 export default function MapView({ reports }) {
   return (
-    <MapContainer
-      center={[19.076, 72.8777]}
-      zoom={12}
-      style={{ height: "400px", width: "100%", marginBottom: "30px" }}
-    >
-      <TileLayer
-        attribution="&copy; OpenStreetMap contributors"
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    <div className="map-wrapper">
+      <MapContainer
+        center={[19.076, 72.8777]}
+        zoom={12}
+        className="map"
+      >
+        <TileLayer
+          attribution="&copy; OpenStreetMap contributors"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-      {reports
-        .filter(r => r.latitude && r.longitude)
-        .map(report => (
-          <Marker
-            key={report.id}
-            position={[report.latitude, report.longitude]}
-          >
-            <Popup>
-              <strong>{report.title}</strong>
-              <br />
-              {report.category}
-              <br />
-              Status: {report.status}
-            </Popup>
-          </Marker>
-        ))}
-    </MapContainer>
+        {reports
+          .filter((r) => r.latitude && r.longitude)
+          .map((report) => (
+            <Marker
+              key={report.id}
+              position={[report.latitude, report.longitude]}
+            >
+              <Popup>
+                <strong>{report.title}</strong>
+                <br />
+                {report.category}
+                <br />
+                Status: {report.status}
+              </Popup>
+            </Marker>
+          ))}
+      </MapContainer>
+
+      {/* ✅ MAP STYLES */}
+      <style jsx>{`
+        .map-wrapper {
+          width: 100%;
+          height: 400px;
+          margin-bottom: 30px;
+        }
+
+        .map {
+          width: 100%;
+          height: 100%;
+        }
+
+        /* ✅ MOBILE RESPONSIVENESS */
+        @media (max-width: 640px) {
+          .map-wrapper {
+            height: 300px;
+          }
+        }
+      `}</style>
+    </div>
   );
 }

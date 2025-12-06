@@ -151,7 +151,7 @@ export default function Dashboard() {
           Problem Reporting Dashboard
         </h1>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div className="header-actions">
           {/* ✅ Dark mode toggle */}
           <button
             onClick={() => {
@@ -191,8 +191,8 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main style={{ padding: 32, maxWidth: 1100, margin: "0 auto" }}>
-        <div className="card">
+      <main className="main">
+        <div className="card map-card">
           <MapView reports={filtered} />
         </div>
 
@@ -225,7 +225,7 @@ export default function Dashboard() {
               <option>Noise</option>
             </select>
 
-            <div style={{ display: "flex", gap: 12 }}>
+            <div className="coords">
               <input placeholder="Latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
               <input placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
             </div>
@@ -282,6 +282,18 @@ export default function Dashboard() {
           border-color: #1e293b;
         }
 
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .main {
+          padding: 32px;
+          max-width: 1100px;
+          margin: 0 auto;
+        }
+
         .card {
           background: white;
           border-radius: 12px;
@@ -328,6 +340,11 @@ export default function Dashboard() {
           margin-bottom: 10px;
         }
 
+        .coords {
+          display: flex;
+          gap: 12px;
+        }
+
         /* 🌗 THEME TOGGLE */
         .theme-toggle {
           width: 42px;
@@ -338,19 +355,6 @@ export default function Dashboard() {
           cursor: pointer;
           display: grid;
           place-items: center;
-          transition: background 0.3s ease, border-color 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-          background: rgba(0, 0, 0, 0.05);
-        }
-
-        .dark .theme-toggle {
-          border-color: #334155;
-        }
-
-        .dark .theme-toggle:hover {
-          background: rgba(255, 255, 255, 0.08);
         }
 
         .theme-toggle .icon {
@@ -364,6 +368,59 @@ export default function Dashboard() {
 
         .dark .theme-toggle .icon {
           transform: rotate(180deg) scale(1.1);
+        }
+
+        /* ✅ MOBILE RESPONSIVENESS */
+        @media (max-width: 640px) {
+          header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+          }
+
+          .header-actions {
+            width: 100%;
+            justify-content: space-between;
+          }
+
+          .main {
+            padding: 16px;
+          }
+
+          .coords {
+            flex-direction: column;
+          }
+
+          input,
+          textarea,
+          select {
+            font-size: 16px;
+          }
+
+          .primary,
+          .gray {
+            padding: 14px;
+          }
+
+          .card {
+            padding: 16px;
+          }
+          .map-card {
+  margin-bottom: 40px;
+}
+
+
+@media (max-width: 640px) {
+  .map-card {
+    margin-bottom: 56px;
+  }
+
+  .map-card :global(.leaflet-container) {
+    position: relative;
+    z-index: 0;
+  }
+}
+
         }
       `}</style>
     </div>
