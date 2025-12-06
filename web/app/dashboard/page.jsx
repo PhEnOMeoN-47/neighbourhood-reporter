@@ -52,7 +52,7 @@ export default function Dashboard() {
     };
   }, []);
 
-  // ✅ Submit report
+  // ✅ SUBMIT REPORT
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
@@ -74,11 +74,8 @@ export default function Dashboard() {
       });
 
       const newReport = await res.json();
-
-      // ✅ Add new report to list immediately
       setReports((prev) => [newReport, ...prev]);
 
-      // ✅ Reset form
       setTitle("");
       setDescription("");
       setCategory("Pothole");
@@ -89,6 +86,16 @@ export default function Dashboard() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // ✅ LOGOUT
+  async function handleLogout() {
+    await fetch("http://127.0.0.1:4000/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    });
+
+    router.push("/login");
   }
 
   if (loading) {
@@ -103,42 +110,48 @@ export default function Dashboard() {
         Logged in as <strong>{user.email}</strong>
       </p>
 
+      {/* ✅ LOGOUT BUTTON */}
+      <button
+        onClick={handleLogout}
+        style={{
+          marginBottom: "30px",
+          padding: "6px 12px",
+          cursor: "pointer",
+        }}
+      >
+        Logout
+      </button>
+
       {/* ✅ REPORT FORM */}
-      <h2 style={{ marginTop: "30px" }}>Report an Issue</h2>
+      <h2>Report an Issue</h2>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: "30px" }}>
-        <div>
-          <input
-            placeholder="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-          />
-        </div>
+        <input
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+        />
 
-        <div>
-          <textarea
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-          />
-        </div>
+        <textarea
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+        />
 
-        <div>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-          >
-            <option>Pothole</option>
-            <option>Garbage</option>
-            <option>Streetlight</option>
-            <option>Safety</option>
-            <option>Noise</option>
-          </select>
-        </div>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+        >
+          <option>Pothole</option>
+          <option>Garbage</option>
+          <option>Streetlight</option>
+          <option>Safety</option>
+          <option>Noise</option>
+        </select>
 
         <div style={{ display: "flex", gap: "10px" }}>
           <input
@@ -160,17 +173,12 @@ export default function Dashboard() {
         <button
           type="submit"
           disabled={submitting}
-          style={{
-            marginTop: "10px",
-            padding: "10px 20px",
-            cursor: "pointer",
-          }}
+          style={{ marginTop: "10px", padding: "10px 20px" }}
         >
           {submitting ? "Submitting..." : "Submit Report"}
         </button>
       </form>
 
-      {/* ✅ REPORT LIST */}
       <h2>Reported Issues</h2>
 
       {reports.length === 0 ? (
@@ -178,7 +186,7 @@ export default function Dashboard() {
       ) : (
         <ul>
           {reports.map((report) => (
-            <li key={report.id} style={{ marginBottom: "8px" }}>
+            <li key={report.id}>
               <strong>{report.title}</strong> — {report.category} (
               {report.status})
             </li>
