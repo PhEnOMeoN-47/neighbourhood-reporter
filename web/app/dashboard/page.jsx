@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
-
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
 });
@@ -16,7 +15,10 @@ export default function Dashboard() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ✅ Filter state
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
+  // ✅ Report form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Pothole");
@@ -52,7 +54,7 @@ export default function Dashboard() {
     loadDashboard();
   }, []);
 
-
+  // ✅ Auto-detect location
   function handleUseMyLocation() {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");
@@ -65,13 +67,27 @@ export default function Dashboard() {
         setLongitude(position.coords.longitude.toFixed(6));
       },
       (error) => {
-        console.error(error);
-        alert("Unable to fetch your location");
-      }
+        console.error("Geolocation error:", error.code, error.message);
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            alert("Location permission denied");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            alert("Location information is unavailable");
+            break;
+          case error.TIMEOUT:
+            alert("Location request timed out");
+            break;
+          default:
+            alert("Unable to fetch your location");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   }
 
-
+  // ✅ Submit report
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
@@ -105,42 +121,7 @@ export default function Dashboard() {
     }
   }
 
-function handleUseMyLocation() {
-  if (!navigator.geolocation) {
-    alert("Geolocation is not supported by your browser");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      setLatitude(position.coords.latitude.toFixed(6));
-      setLongitude(position.coords.longitude.toFixed(6));
-    },
-    (error) => {
-      console.error("Geolocation error:", error.code, error.message);
-
-      switch (error.code) {
-        case error.PERMISSION_DENIED:
-          alert("Location permission denied");
-          break;
-        case error.POSITION_UNAVAILABLE:
-          alert("Location information is unavailable");
-          break;
-        case error.TIMEOUT:
-          alert("Location request timed out");
-          break;
-        default:
-          alert("Unable to fetch your location");
-      }
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-    }
-  );
-}
-
-
+  // ✅ Logout
   async function handleLogout() {
     await fetch("http://127.0.0.1:4000/auth/logout", {
       method: "POST",
@@ -148,6 +129,12 @@ function handleUseMyLocation() {
     });
     router.push("/login");
   }
+
+  // ✅ Filtered reports (single source of truth)
+  const filteredReports =
+    selectedCategory === "All"
+      ? reports
+      : reports.filter((r) => r.category === selectedCategory);
 
   if (loading) {
     return <p style={{ padding: 40 }}>Loading dashboard...</p>;
@@ -165,11 +152,26 @@ function handleUseMyLocation() {
         Logout
       </button>
 
+      {/* ✅ FILTER */}
+      <h2>Filter Reports</h2>
+      <select
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+        style={{ width: "100%", padding: "8px", marginBottom: "20px" }}
+      >
+        <option value="All">All</option>
+        <option value="Pothole">Pothole</option>
+        <option value="Garbage">Garbage</option>
+        <option value="Streetlight">Streetlight</option>
+        <option value="Safety">Safety</option>
+        <option value="Noise">Noise</option>
+      </select>
 
+      {/* ✅ MAP */}
       <h2>Map View</h2>
-      <MapView reports={reports} />
+      <MapView reports={filteredReports} />
 
-
+      {/* ✅ REPORT FORM */}
       <h2>Report an Issue</h2>
 
       <form onSubmit={handleSubmit} style={{ marginBottom: "30px" }}>
@@ -217,7 +219,6 @@ function handleUseMyLocation() {
           />
         </div>
 
-
         <button
           type="button"
           onClick={handleUseMyLocation}
@@ -233,14 +234,14 @@ function handleUseMyLocation() {
         </button>
       </form>
 
-
+      {/* ✅ LIST */}
       <h2>Reported Issues</h2>
 
-      {reports.length === 0 ? (
-        <p>No issues reported yet.</p>
+      {filteredReports.length === 0 ? (
+        <p>No issues found.</p>
       ) : (
         <ul>
-          {reports.map((report) => (
+          {filteredReports.map((report) => (
             <li key={report.id}>
               <strong>{report.title}</strong> — {report.category} (
               {report.status})
