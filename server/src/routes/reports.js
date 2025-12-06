@@ -1,26 +1,10 @@
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 const db = require("../db/database");
+const { verifyJwt, requireAdmin } = require("../utils/auth");
 
-// ✅ JWT middleware
-function verifyJwt(req, res, next) {
-  const token = req.cookies.token;
-
-  if (!token) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
-    next();
-  } catch {
-    return res.status(401).json({ error: "Invalid token" });
-  }
-}
-
-// ✅ POST /reports
+// ✅ POST /reports (authenticated users)
 router.post("/", verifyJwt, async (req, res) => {
   try {
     const { title, description, category, latitude, longitude } = req.body;
@@ -55,7 +39,7 @@ router.post("/", verifyJwt, async (req, res) => {
   }
 });
 
-// ✅ GET /reports
+// ✅ GET /reports (public / authenticated – your choice)
 router.get("/", async (req, res) => {
   try {
     const result = await db.query(
@@ -67,5 +51,43 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+// ✅ PATCH /reports/:id/status (admin only)
+router.patch(
+  "/:id/status",
+  verifyJwt,
+  requireAdmin,
+  async (req, res) => {
+    const { status } = req.body;
+    const { id } = req.params;
+
+    const allowedStatuses = ["open", "in-progress", "resolved"];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({ error: "Invalid status value" });
+    }
+
+    try {
+      const result = await db.query(
+        `
+        UPDATE reports
+        SET status = $1
+        WHERE id = $2
+        RETURNING *
+        `,
+        [status, id]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+
+      res.json(result.rows[0]);
+    } catch (err) {
+      console.error("Error updating status:", err);
+      res.status(500).json({ error: "Server error" });
+    }
+  }
+);
 
 module.exports = router;

@@ -15,16 +15,18 @@ export default function Dashboard() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Filter state
+  // ✅ filter
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // ✅ Report form state
+  // ✅ report form
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Pothole");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const isAdmin = user?.email === "anshul2004ak@gmail.com";
 
   useEffect(() => {
     async function loadDashboard() {
@@ -54,7 +56,7 @@ export default function Dashboard() {
     loadDashboard();
   }, []);
 
-  // ✅ Auto-detect location
+  // ✅ use my location
   function handleUseMyLocation() {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser");
@@ -62,32 +64,15 @@ export default function Dashboard() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setLatitude(position.coords.latitude.toFixed(6));
-        setLongitude(position.coords.longitude.toFixed(6));
+      (pos) => {
+        setLatitude(pos.coords.latitude.toFixed(6));
+        setLongitude(pos.coords.longitude.toFixed(6));
       },
-      (error) => {
-        console.error("Geolocation error:", error.code, error.message);
-
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            alert("Location permission denied");
-            break;
-          case error.POSITION_UNAVAILABLE:
-            alert("Location information is unavailable");
-            break;
-          case error.TIMEOUT:
-            alert("Location request timed out");
-            break;
-          default:
-            alert("Unable to fetch your location");
-        }
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
+      () => alert("Unable to fetch your location")
     );
   }
 
-  // ✅ Submit report
+  // ✅ submit report
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
@@ -121,7 +106,35 @@ export default function Dashboard() {
     }
   }
 
-  // ✅ Logout
+  // ✅ admin status update
+  async function handleStatusChange(reportId, newStatus) {
+    try {
+      const res = await fetch(
+        `http://127.0.0.1:4000/reports/${reportId}/status`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || "Failed to update status");
+        return;
+      }
+
+      const updated = await res.json();
+      setReports((prev) =>
+        prev.map((r) => (r.id === updated.id ? updated : r))
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // ✅ logout
   async function handleLogout() {
     await fetch("http://127.0.0.1:4000/auth/logout", {
       method: "POST",
@@ -130,7 +143,6 @@ export default function Dashboard() {
     router.push("/login");
   }
 
-  // ✅ Filtered reports (single source of truth)
   const filteredReports =
     selectedCategory === "All"
       ? reports
@@ -141,7 +153,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={{ padding: "40px", maxWidth: "800px" }}>
+    <div style={{ padding: 40, maxWidth: 800 }}>
       <h1>Dashboard</h1>
 
       <p>
@@ -152,48 +164,45 @@ export default function Dashboard() {
         Logout
       </button>
 
-      {/* ✅ FILTER */}
       <h2>Filter Reports</h2>
       <select
         value={selectedCategory}
         onChange={(e) => setSelectedCategory(e.target.value)}
-        style={{ width: "100%", padding: "8px", marginBottom: "20px" }}
+        style={{ width: "100%", padding: 8, marginBottom: 20 }}
       >
         <option value="All">All</option>
-        <option value="Pothole">Pothole</option>
-        <option value="Garbage">Garbage</option>
-        <option value="Streetlight">Streetlight</option>
-        <option value="Safety">Safety</option>
-        <option value="Noise">Noise</option>
+        <option>Pothole</option>
+        <option>Garbage</option>
+        <option>Streetlight</option>
+        <option>Safety</option>
+        <option>Noise</option>
       </select>
 
-      {/* ✅ MAP */}
       <h2>Map View</h2>
       <MapView reports={filteredReports} />
 
-      {/* ✅ REPORT FORM */}
       <h2>Report an Issue</h2>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: "30px" }}>
+      <form onSubmit={handleSubmit} style={{ marginBottom: 30 }}>
         <input
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+          style={{ width: "100%", padding: 8, marginBottom: 10 }}
         />
 
         <textarea
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+          style={{ width: "100%", padding: 8, marginBottom: 10 }}
         />
 
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+          style={{ width: "100%", padding: 8, marginBottom: 10 }}
         >
           <option>Pothole</option>
           <option>Garbage</option>
@@ -202,28 +211,24 @@ export default function Dashboard() {
           <option>Noise</option>
         </select>
 
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: 10 }}>
           <input
             type="number"
             placeholder="Latitude"
             value={latitude}
             onChange={(e) => setLatitude(e.target.value)}
-            style={{ flex: 1, padding: "8px" }}
+            style={{ flex: 1, padding: 8 }}
           />
           <input
             type="number"
             placeholder="Longitude"
             value={longitude}
             onChange={(e) => setLongitude(e.target.value)}
-            style={{ flex: 1, padding: "8px" }}
+            style={{ flex: 1, padding: 8 }}
           />
         </div>
 
-        <button
-          type="button"
-          onClick={handleUseMyLocation}
-          style={{ marginTop: 8 }}
-        >
+        <button type="button" onClick={handleUseMyLocation} style={{ marginTop: 8 }}>
           Use my location
         </button>
 
@@ -234,7 +239,6 @@ export default function Dashboard() {
         </button>
       </form>
 
-      {/* ✅ LIST */}
       <h2>Reported Issues</h2>
 
       {filteredReports.length === 0 ? (
@@ -242,9 +246,22 @@ export default function Dashboard() {
       ) : (
         <ul>
           {filteredReports.map((report) => (
-            <li key={report.id}>
+            <li key={report.id} style={{ marginBottom: 8 }}>
               <strong>{report.title}</strong> — {report.category} (
               {report.status})
+              {isAdmin && (
+                <select
+                  value={report.status}
+                  onChange={(e) =>
+                    handleStatusChange(report.id, e.target.value)
+                  }
+                  style={{ marginLeft: 10 }}
+                >
+                  <option value="open">open</option>
+                  <option value="in-progress">in-progress</option>
+                  <option value="resolved">resolved</option>
+                </select>
+              )}
             </li>
           ))}
         </ul>
