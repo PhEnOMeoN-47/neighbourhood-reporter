@@ -37,6 +37,10 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // ✅ DARK MODE STATE
+  const [theme, setTheme] = useState("light");
+
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   // form state
@@ -48,6 +52,12 @@ export default function Dashboard() {
   const [submitting, setSubmitting] = useState(false);
 
   const isAdmin = user?.email === "anshul2004ak@gmail.com";
+
+  // ✅ Load saved theme
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved) setTheme(saved);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -127,11 +137,10 @@ export default function Dashboard() {
       : reports.filter((r) => r.category === selectedCategory);
 
   return (
-    <div style={{ background: "#f6f7fb", minHeight: "100vh", color: "#111827" }}>
-      {/* ✅ NAVBAR */}
+    <div className={theme} style={{ minHeight: "100vh" }}>
+      {/* NAVBAR */}
       <header
         style={{
-          background: "white",
           padding: "16px 32px",
           display: "flex",
           justifyContent: "space-between",
@@ -142,10 +151,25 @@ export default function Dashboard() {
           Problem Reporting Dashboard
         </h1>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {/* ✅ Dark mode toggle */}
+          <button
+            onClick={() => {
+              const next = theme === "light" ? "dark" : "light";
+              setTheme(next);
+              localStorage.setItem("theme", next);
+            }}
+            className="theme-toggle"
+            aria-label="Toggle theme"
+          >
+            <span className="icon">
+              {theme === "light" ? "🌙" : "☀️"}
+            </span>
+          </button>
+
           <div style={{ textAlign: "right", fontSize: 14 }}>
             <div>{user.email.split("@")[0]}</div>
-            <div style={{ color: "#111827" }}>{user.email}</div>
+            <div>{user.email}</div>
           </div>
 
           <button
@@ -168,12 +192,10 @@ export default function Dashboard() {
       </header>
 
       <main style={{ padding: 32, maxWidth: 1100, margin: "0 auto" }}>
-        {/* MAP */}
         <div className="card">
           <MapView reports={filtered} />
         </div>
 
-        {/* FILTER */}
         <div className="card">
           <h3>Filter by Category</h3>
           <select
@@ -189,25 +211,13 @@ export default function Dashboard() {
           </select>
         </div>
 
-        {/* FORM */}
         <div className="card">
           <h2>Report an Issue</h2>
 
           <form onSubmit={handleSubmit}>
-            <input
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <textarea
-              placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
+            <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+            <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
+            <select value={category} onChange={(e) => setCategory(e.target.value)}>
               <option>Pothole</option>
               <option>Garbage</option>
               <option>Streetlight</option>
@@ -216,16 +226,8 @@ export default function Dashboard() {
             </select>
 
             <div style={{ display: "flex", gap: 12 }}>
-              <input
-                placeholder="Latitude"
-                value={latitude}
-                onChange={(e) => setLatitude(e.target.value)}
-              />
-              <input
-                placeholder="Longitude"
-                value={longitude}
-                onChange={(e) => setLongitude(e.target.value)}
-              />
+              <input placeholder="Latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+              <input placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
             </div>
 
             <button type="button" className="gray" onClick={handleUseMyLocation}>
@@ -238,7 +240,6 @@ export default function Dashboard() {
           </form>
         </div>
 
-        {/* LIST */}
         <h2 style={{ marginTop: 32 }}>Reported Issues</h2>
 
         {filtered.map((r) => (
@@ -248,7 +249,7 @@ export default function Dashboard() {
               <StatusBadge status={r.status} />
             </div>
 
-            <p style={{ color: "#111827" }}>{r.category}</p>
+            <p>{r.category}</p>
 
             {isAdmin && (
               <select
@@ -266,27 +267,50 @@ export default function Dashboard() {
 
       {/* ✅ STYLES */}
       <style jsx>{`
+        .light {
+          background: #f6f7fb;
+          color: #111827;
+        }
+
+        .dark {
+          background: #020617;
+          color: #f8fafc;
+        }
+
+        .dark header {
+          background: #020617;
+          border-color: #1e293b;
+        }
+
         .card {
           background: white;
           border-radius: 12px;
           padding: 20px;
           margin-bottom: 24px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 2px 10px rgba(0,0,0,0.04);
         }
-        input,
-        textarea,
-        select {
+
+        .dark .card {
+          background: #020617;
+          border: 1px solid #1e293b;
+        }
+
+        input, textarea, select {
           width: 100%;
           padding: 10px;
           margin-bottom: 12px;
           border-radius: 8px;
           border: 1px solid #d1d5db;
-          color: #111827;
         }
-        input::placeholder,
-        textarea::placeholder {
-          color: #111827;
+
+        .dark input,
+        .dark textarea,
+        .dark select {
+          background: #020617;
+          border-color: #334155;
+          color: #f8fafc;
         }
+
         .primary {
           background: #2563eb;
           color: white;
@@ -294,6 +318,7 @@ export default function Dashboard() {
           border-radius: 8px;
           width: 100%;
         }
+
         .gray {
           background: #6b7280;
           color: white;
@@ -301,6 +326,44 @@ export default function Dashboard() {
           border-radius: 8px;
           width: 100%;
           margin-bottom: 10px;
+        }
+
+        /* 🌗 THEME TOGGLE */
+        .theme-toggle {
+          width: 42px;
+          height: 42px;
+          border-radius: 999px;
+          border: 1px solid #d1d5db;
+          background: transparent;
+          cursor: pointer;
+          display: grid;
+          place-items: center;
+          transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+          background: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark .theme-toggle {
+          border-color: #334155;
+        }
+
+        .dark .theme-toggle:hover {
+          background: rgba(255, 255, 255, 0.08);
+        }
+
+        .theme-toggle .icon {
+          font-size: 18px;
+          transition: transform 0.35s ease;
+        }
+
+        .light .theme-toggle .icon {
+          transform: rotate(0deg) scale(1);
+        }
+
+        .dark .theme-toggle .icon {
+          transform: rotate(180deg) scale(1.1);
         }
       `}</style>
     </div>
