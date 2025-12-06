@@ -17,11 +17,15 @@ L.Icon.Default.mergeOptions({
 
 export default function MapView({ reports }) {
   return (
-    <div className="map-wrapper">
+    <>
       <MapContainer
         center={[19.076, 72.8777]}
         zoom={12}
-        className="map"
+        style={{
+          height: "400px",
+          width: "100%",
+          marginBottom: "30px",
+        }}
       >
         <TileLayer
           attribution="&copy; OpenStreetMap contributors"
@@ -46,26 +50,14 @@ export default function MapView({ reports }) {
           ))}
       </MapContainer>
 
-      {/* ✅ MAP STYLES */}
+      {/* ✅ SAFE MOBILE HEIGHT OVERRIDE */}
       <style jsx>{`
-        .map-wrapper {
-          width: 100%;
-          height: 400px;
-          margin-bottom: 30px;
-        }
-
-        .map {
-          width: 100%;
-          height: 100%;
-        }
-
-        /* ✅ MOBILE RESPONSIVENESS */
         @media (max-width: 640px) {
-          .map-wrapper {
-            height: 300px;
+          :global(.leaflet-container) {
+            height: 300px !important;
           }
         }
       `}</style>
-    </div>
+    </>
   );
 }
