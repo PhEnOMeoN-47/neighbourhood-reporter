@@ -34,8 +34,8 @@ router.get(
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // localhost only
-      sameSite: "lax",
+      secure: true, 
+      sameSite: "None",
     });
 
 
