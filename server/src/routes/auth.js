@@ -52,11 +52,13 @@ router.get("/failure", (req, res) => {
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "None",
   });
 
   res.json({ message: "Logged out successfully" });
 });
+
 
 
 module.exports = router;
