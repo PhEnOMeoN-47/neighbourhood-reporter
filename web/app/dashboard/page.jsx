@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
-/* ✅ STATUS BADGE — JS ONLY */
 function StatusBadge({ status }) {
   const colors = {
     open: "#f97316",
@@ -21,9 +20,8 @@ function StatusBadge({ status }) {
         borderRadius: 999,
         backgroundColor: colors[status],
         color: "white",
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 600,
-        textTransform: "uppercase",
       }}
     >
       {status}
@@ -38,16 +36,6 @@ export default function Dashboard() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState("light");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("Pothole");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  const isAdmin = user?.email === "anshul2004ak@gmail.com";
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -55,57 +43,47 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-  async function load() {
+    async function load() {
+      const meRes = await fetch(
+        "https://neighbourhood-reporter-api.onrender.com/me",
+        { credentials: "include" }
+      );
 
-    await new Promise((r) => setTimeout(r, 300));
+      if (!meRes.ok) {
+        router.push("/login");
+        return;
+      }
 
-    const me = await fetch(
-      "https://neighbourhood-reporter-api.onrender.com/me",
-      { credentials: "include" }
-    );
+      const me = await meRes.json();
+      setUser(me);
 
-    if (!me.ok) {
-      router.push("/login");
-      return;
+      const repRes = await fetch(
+        "https://neighbourhood-reporter-api.onrender.com/reports",
+        { credentials: "include" }
+      );
+
+      setReports(await repRes.json());
+      setLoading(false);
     }
 
-    setUser(await me.json());
-
-    const reportsRes = await fetch(
-      "https://neighbourhood-reporter-api.onrender.com/reports",
-      { credentials: "include" }
-    );
-
-    setReports(await reportsRes.json());
-    setLoading(false);
-  }
-
-  load();
-}, [router]);
-
+    load();
+  }, [router]);
 
   if (loading) return <p style={{ padding: 40 }}>Loading…</p>;
 
-  const filtered =
-    selectedCategory === "All"
-      ? reports
-      : reports.filter((r) => r.category === selectedCategory);
-
   return (
-    <div className={theme} style={{ minHeight: "100vh" }}>
+    <div className={theme} style={{ minHeight: "100vh", padding: 32 }}>
       <header
         style={{
-          padding: "16px 32px",
           display: "flex",
           justifyContent: "space-between",
-          borderBottom: "1px solid #e5e7eb",
+          alignItems: "center",
+          marginBottom: 24,
         }}
       >
-        <h1 style={{ color: "#2563eb", fontWeight: 600 }}>
-          Problem Reporting Dashboard
-        </h1>
+        <h2>Neighbourhood Dashboard</h2>
 
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
           <button
             onClick={() => {
               const next = theme === "light" ? "dark" : "light";
@@ -116,9 +94,7 @@ export default function Dashboard() {
             {theme === "light" ? "🌙" : "☀️"}
           </button>
 
-          <div>
-            <div>{user.email}</div>
-          </div>
+          <span>{user.email}</span>
 
           <button
             onClick={() =>
@@ -133,17 +109,25 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main style={{ padding: 32 }}>
-        <MapView reports={filtered} />
+      <MapView reports={reports} />
 
-        <h2>Reported Issues</h2>
+      <h3 style={{ marginTop: 24 }}>Reports</h3>
 
-        {filtered.map((r) => (
-          <div key={r.id}>
-            <strong>{r.title}</strong> <StatusBadge status={r.status} />
-          </div>
-        ))}
-      </main>
+      {reports.map((r) => (
+        <div
+          key={r.id}
+          style={{
+            padding: 12,
+            border: "1px solid #ddd",
+            borderRadius: 8,
+            marginBottom: 12,
+          }}
+        >
+          <strong>{r.title}</strong>{" "}
+          <StatusBadge status={r.status} />
+          <div>{r.category}</div>
+        </div>
+      ))}
     </div>
   );
 }
