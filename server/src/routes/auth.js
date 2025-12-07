@@ -39,7 +39,7 @@ router.get(
     });
 
 
-    return res.redirect("http://127.0.0.1:3000/dashboard");
+    return res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
 
   }
 );
