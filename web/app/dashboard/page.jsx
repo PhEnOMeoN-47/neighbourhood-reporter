@@ -61,7 +61,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function load() {
-      const me = await fetch("http://127.0.0.1:4000/me", {
+      const me = await fetch("https://neighbourhood-reporter-api.onrender.com/me", {
         credentials: "include",
       });
 
@@ -70,7 +70,7 @@ export default function Dashboard() {
       setUser(await me.json());
 
       const reportsData = await (
-        await fetch("http://127.0.0.1:4000/reports")
+        await fetch("http://https://neighbourhood-reporter-api.onrender.com/reports")
       ).json();
 
       setReports(reportsData);
@@ -91,7 +91,7 @@ export default function Dashboard() {
     e.preventDefault();
     setSubmitting(true);
 
-    const res = await fetch("http://127.0.0.1:4000/reports", {
+    const res = await fetch("https://neighbourhood-reporter-api.onrender.com/reports", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -116,7 +116,7 @@ export default function Dashboard() {
 
   async function handleStatusChange(id, status) {
     const res = await fetch(
-      `http://127.0.0.1:4000/reports/${id}/status`,
+      `https://neighbourhood-reporter-api.onrender.com/reports/${id}/status`,
       {
         method: "PATCH",
         credentials: "include",
@@ -174,7 +174,7 @@ export default function Dashboard() {
 
           <button
             onClick={() =>
-              fetch("http://127.0.0.1:4000/auth/logout", {
+              fetch("https://neighbourhood-reporter-api.onrender.com/auth/logout", {
                 method: "POST",
                 credentials: "include",
               }).then(() => router.push("/login"))

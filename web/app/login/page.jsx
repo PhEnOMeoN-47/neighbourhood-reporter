@@ -2,7 +2,7 @@
 
 export default function LoginPage() {
   function handleGoogleLogin() {
-    window.location.href = "http://127.0.0.1:4000/auth/google";
+    window.location.href = "https://neighbourhood-reporter-api.onrender.com/auth/google";
   }
 
   return (
