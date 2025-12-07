@@ -1,5 +1,4 @@
 require("dotenv").config();
-app.set("trust proxy", 1);
 
 const express = require("express");
 const cors = require("cors");
@@ -7,7 +6,8 @@ const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
-const app = express();
+const app = express();              // ✅ app must be created FIRST
+app.set("trust proxy", 1);          // ✅ then trusted
 
 app.use(
   cors({
@@ -21,9 +21,9 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 require("./utils/passport-google");
+
 app.use("/auth", require("./routes/auth"));
 app.use("/reports", require("./routes/reports"));
-
 
 function verifyJwt(req, res, next) {
   const token = req.cookies.token;
@@ -41,14 +41,12 @@ function verifyJwt(req, res, next) {
   }
 }
 
-
 app.get("/me", verifyJwt, (req, res) => {
   res.json({
     id: req.user.id,
     email: req.user.email,
   });
 });
-
 
 app.get("/", (req, res) => {
   res.json({ message: "Neighbourhood Reporter API is running" });
@@ -58,4 +56,3 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
