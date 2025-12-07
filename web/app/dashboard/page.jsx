@@ -55,30 +55,34 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    async function load() {
-      const me = await fetch(
-        "https://neighbourhood-reporter-api.onrender.com/me",
-        { credentials: "include" }
-      );
+  async function load() {
 
-      if (!me.ok) {
-        router.push("/login");
-        return;
-      }
+    await new Promise((r) => setTimeout(r, 300));
 
-      setUser(await me.json());
+    const me = await fetch(
+      "https://neighbourhood-reporter-api.onrender.com/me",
+      { credentials: "include" }
+    );
 
-      const reportsRes = await fetch(
-        "https://neighbourhood-reporter-api.onrender.com/reports",
-        { credentials: "include" }
-      );
-
-      setReports(await reportsRes.json());
-      setLoading(false);
+    if (!me.ok) {
+      router.push("/login");
+      return;
     }
 
-    load();
-  }, [router]);
+    setUser(await me.json());
+
+    const reportsRes = await fetch(
+      "https://neighbourhood-reporter-api.onrender.com/reports",
+      { credentials: "include" }
+    );
+
+    setReports(await reportsRes.json());
+    setLoading(false);
+  }
+
+  load();
+}, [router]);
+
 
   if (loading) return <p style={{ padding: 40 }}>Loading…</p>;
 
