@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
+
 function StatusBadge({ status }) {
   const colors = {
     open: "#f97316",
@@ -20,8 +21,9 @@ function StatusBadge({ status }) {
         borderRadius: 999,
         backgroundColor: colors[status],
         color: "white",
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: 600,
+        textTransform: "uppercase",
       }}
     >
       {status}
@@ -35,7 +37,19 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [theme, setTheme] = useState("light");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("Pothole");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const isAdmin = user?.email === "anshul2004ak@gmail.com";
+
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -44,57 +58,124 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function load() {
-      const meRes = await fetch(
+      const me = await fetch(
         "https://neighbourhood-reporter-api.onrender.com/me",
         { credentials: "include" }
       );
 
-      if (!meRes.ok) {
+      if (!me.ok) {
         router.push("/login");
         return;
       }
 
-      const me = await meRes.json();
-      setUser(me);
+      setUser(await me.json());
 
-      const repRes = await fetch(
+
+      const reportsRes = await fetch(
         "https://neighbourhood-reporter-api.onrender.com/reports",
         { credentials: "include" }
       );
 
-      setReports(await repRes.json());
+      setReports(await reportsRes.json());
       setLoading(false);
     }
 
     load();
   }, [router]);
 
+  function handleUseMyLocation() {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setLatitude(pos.coords.latitude.toFixed(6));
+      setLongitude(pos.coords.longitude.toFixed(6));
+    });
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitting(true);
+
+    const res = await fetch(
+      "https://neighbourhood-reporter-api.onrender.com/reports",
+      {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          description,
+          category,
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+        }),
+      }
+    );
+
+    const newReport = await res.json();
+    setReports((prev) => [newReport, ...prev]);
+
+    setSubmitting(false);
+    setTitle("");
+    setDescription("");
+    setLatitude("");
+    setLongitude("");
+  }
+
+  async function handleStatusChange(id, status) {
+    const res = await fetch(
+      `https://neighbourhood-reporter-api.onrender.com/reports/${id}/status`,
+      {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+    const updated = await res.json();
+    setReports((prev) =>
+      prev.map((r) => (r.id === id ? updated : r))
+    );
+  }
+
   if (loading) return <p style={{ padding: 40 }}>Loading…</p>;
 
+  const filtered =
+    selectedCategory === "All"
+      ? reports
+      : reports.filter((r) => r.category === selectedCategory);
+
   return (
-    <div className={theme} style={{ minHeight: "100vh", padding: 32 }}>
+    <div className={theme} style={{ minHeight: "100vh" }}>
       <header
         style={{
+          padding: "16px 32px",
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 24,
+          borderBottom: "1px solid #e5e7eb",
         }}
       >
-        <h2>Neighbourhood Dashboard</h2>
+        <h1 style={{ color: "#2563eb", fontWeight: 600 }}>
+          Problem Reporting Dashboard
+        </h1>
 
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <div className="header-actions">
           <button
             onClick={() => {
               const next = theme === "light" ? "dark" : "light";
               setTheme(next);
               localStorage.setItem("theme", next);
             }}
+            className="theme-toggle"
           >
-            {theme === "light" ? "🌙" : "☀️"}
+            <span className="icon">
+              {theme === "light" ? "🌙" : "☀️"}
+            </span>
           </button>
 
-          <span>{user.email}</span>
+          <div style={{ textAlign: "right", fontSize: 14 }}>
+            <div>{user.email.split("@")[0]}</div>
+            <div>{user.email}</div>
+          </div>
 
           <button
             onClick={() =>
@@ -103,31 +184,116 @@ export default function Dashboard() {
                 { method: "POST", credentials: "include" }
               ).then(() => router.push("/login"))
             }
+            style={{
+              background: "#dc2626",
+              color: "white",
+              borderRadius: 8,
+              padding: "8px 16px",
+            }}
           >
             Logout
           </button>
         </div>
       </header>
 
-      <MapView reports={reports} />
-
-      <h3 style={{ marginTop: 24 }}>Reports</h3>
-
-      {reports.map((r) => (
-        <div
-          key={r.id}
-          style={{
-            padding: 12,
-            border: "1px solid #ddd",
-            borderRadius: 8,
-            marginBottom: 12,
-          }}
-        >
-          <strong>{r.title}</strong>{" "}
-          <StatusBadge status={r.status} />
-          <div>{r.category}</div>
+      <main className="main">
+        <div className="card map-card">
+          <MapView reports={filtered} />
         </div>
-      ))}
+
+        <div className="card">
+          <h3>Filter by Category</h3>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <option value="All">Select a category</option>
+            <option>Pothole</option>
+            <option>Garbage</option>
+            <option>Streetlight</option>
+            <option>Safety</option>
+            <option>Noise</option>
+          </select>
+        </div>
+
+        <div className="card">
+          <h2>Report an Issue</h2>
+
+          <form onSubmit={handleSubmit}>
+            <input
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <textarea
+              placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option>Pothole</option>
+              <option>Garbage</option>
+              <option>Streetlight</option>
+              <option>Safety</option>
+              <option>Noise</option>
+            </select>
+
+            <div className="coords">
+              <input
+                placeholder="Latitude"
+                value={latitude}
+                onChange={(e) => setLatitude(e.target.value)}
+              />
+              <input
+                placeholder="Longitude"
+                value={longitude}
+                onChange={(e) => setLongitude(e.target.value)}
+              />
+            </div>
+
+            <button
+              type="button"
+              className="gray"
+              onClick={handleUseMyLocation}
+            >
+              Use My Location
+            </button>
+
+            <button disabled={submitting} className="primary">
+              Submit Report
+            </button>
+          </form>
+        </div>
+
+        <h2 style={{ marginTop: 32 }}>Reported Issues</h2>
+
+        {filtered.map((r) => (
+          <div key={r.id} className="card">
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <strong>{r.title}</strong>
+              <StatusBadge status={r.status} />
+            </div>
+
+            <p>{r.category}</p>
+
+            {isAdmin && (
+              <select
+                value={r.status}
+                onChange={(e) =>
+                  handleStatusChange(r.id, e.target.value)
+                }
+              >
+                <option value="open">Open</option>
+                <option value="in-progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            )}
+          </div>
+        ))}
+      </main>
     </div>
   );
 }
