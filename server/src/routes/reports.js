@@ -7,7 +7,7 @@ const { verifyJwt, requireAdmin } = require("../utils/auth");
 // ✅ POST /reports (authenticated users)
 router.post("/", verifyJwt, async (req, res) => {
   try {
-    const { title, description, category, latitude, longitude } = req.body;
+    const { title, description, category, problem, latitude, longitude } = req.body;
 
     if (!title || !category) {
       return res
@@ -18,8 +18,8 @@ router.post("/", verifyJwt, async (req, res) => {
     const result = await db.query(
       `
       INSERT INTO reports 
-      (user_id, title, description, category, latitude, longitude)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      (user_id, title, description, category,problem, latitude, longitude)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
       `,
       [
@@ -27,6 +27,7 @@ router.post("/", verifyJwt, async (req, res) => {
         title,
         description || "",
         category,
+        problem || "",
         latitude || null,
         longitude || null,
       ]
