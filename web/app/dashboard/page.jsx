@@ -181,149 +181,220 @@ export default function Dashboard() {
       </header>
 
       <main className="main">
-        <div className="card map-card">
-          <MapView reports={filtered} />
+  <div className="card map-card">
+    <MapView reports={filtered} />
+  </div>
+
+  <div className="card">
+    <h3 className="section-title">Filter by Category</h3>
+    <select
+      className="input"
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+    >
+      <option value="All">Select a category</option>
+      <option>Pothole</option>
+      <option>Garbage</option>
+      <option>Streetlight</option>
+      <option>Safety</option>
+      <option>Noise</option>
+    </select>
+  </div>
+
+  <div className="card">
+    <h2 className="section-title">Report an Issue</h2>
+
+    <form onSubmit={handleSubmit} className="form">
+      <label>Title</label>
+      <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} />
+
+      <label>Description</label>
+      <textarea
+        className="textarea"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+
+      <label>Category</label>
+      <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
+        <option>Pothole</option>
+        <option>Garbage</option>
+        <option>Streetlight</option>
+        <option>Safety</option>
+        <option>Noise</option>
+      </select>
+
+      <div className="coords">
+        <div>
+          <label>Latitude</label>
+          <input className="input" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
         </div>
-
-        <div className="card">
-          <h3>Filter by Category</h3>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="All">All</option>
-            <option>Pothole</option>
-            <option>Garbage</option>
-            <option>Streetlight</option>
-            <option>Safety</option>
-            <option>Noise</option>
-          </select>
+        <div>
+          <label>Longitude</label>
+          <input className="input" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
         </div>
+      </div>
 
-        <div className="card">
-          <h2>Report an Issue</h2>
-          <form onSubmit={handleSubmit}>
-            <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
-            <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option>Pothole</option>
-              <option>Garbage</option>
-              <option>Streetlight</option>
-              <option>Safety</option>
-              <option>Noise</option>
-            </select>
+      <button type="button" className="btn-secondary" onClick={handleUseMyLocation}>
+        📍 Use My Location
+      </button>
 
-            <div className="coords">
-              <input placeholder="Latitude" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
-              <input placeholder="Longitude" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
-            </div>
+      <button disabled={submitting} className="btn-primary">
+        Submit Report
+      </button>
+    </form>
+  </div>
 
-            <button type="button" className="gray" onClick={handleUseMyLocation}>
-              Use My Location
-            </button>
+  <h2 className="section-title">Reported Issues</h2>
 
-            <button disabled={submitting} className="primary">
-              Submit Report
-            </button>
-          </form>
-        </div>
+  {filtered.map((r) => (
+    <div key={r.id} className="issue-card">
+      <div className="issue-header">
+        <strong>{r.title}</strong>
+        <StatusBadge status={r.status} />
+      </div>
 
-        <h2 style={{ marginTop: 32 }}>Reported Issues</h2>
+      <p className="issue-desc">{r.description}</p>
 
-        {filtered.map((r) => (
-          <div key={r.id} className="card">
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <strong>{r.title}</strong>
-              <StatusBadge status={r.status} />
-            </div>
-            <p>{r.category}</p>
+      <div className="issue-footer">
+        <span className="pill">{r.category}</span>
+      </div>
 
-            {isAdmin && (
-              <select
-                value={r.status}
-                onChange={(e) =>
-                  handleStatusChange(r.id, e.target.value)
-                }
-              >
-                <option value="open">Open</option>
-                <option value="in-progress">In Progress</option>
-                <option value="resolved">Resolved</option>
-              </select>
-            )}
-          </div>
-        ))}
-      </main>
+      {isAdmin && (
+        <select
+          className="input"
+          value={r.status}
+          onChange={(e) => handleStatusChange(r.id, e.target.value)}
+        >
+          <option value="open">Open</option>
+          <option value="in-progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      )}
+    </div>
+  ))}
+</main>
+
 
       {/* STYLES */}
       <style jsx>{`
-        .light {
-          background: #f6f7fb;
-          color: #111827;
-          min-height: 100vh;
-        }
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px;
+  }
 
-        .dark {
-          background: #020617;
-          color: #f8fafc;
-          min-height: 100vh;
-        }
+  .section-title {
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
 
-        header {
-          padding: 16px 32px;
-          display: flex;
-          justify-content: space-between;
-          border-bottom: 1px solid #e5e7eb;
-        }
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
 
-        .dark header {
-          border-color: #1e293b;
-        }
+  .dark .card {
+    background: #020617;
+    border: 1px solid #1e293b;
+  }
 
-        .header-actions {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-        }
+  .form label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 500;
+  }
 
-        .main {
-          padding: 32px;
-          max-width: 1100px;
-          margin: 0 auto;
-        }
+  .input,
+  .textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    margin-bottom: 16px;
+  }
 
-        .card {
-          background: white;
-          border-radius: 12px;
-          padding: 20px;
-          margin-bottom: 24px;
-        }
+  .textarea {
+    min-height: 120px;
+  }
 
-        .dark .card {
-          background: #020617;
-          border: 1px solid #1e293b;
-        }
+  .dark .input,
+  .dark .textarea {
+    background: #020617;
+    color: #f8fafc;
+    border-color: #334155;
+  }
 
-        .coords {
-          display: flex;
-          gap: 12px;
-        }
+  .coords {
+    display: flex;
+    gap: 16px;
+  }
 
-        .theme-toggle {
-          width: 42px;
-          height: 42px;
-          border-radius: 999px;
-          border: 1px solid #d1d5db;
-          background: transparent;
-          cursor: pointer;
-        }
+  .btn-secondary {
+    background: #4b5563;
+    color: white;
+    padding: 14px;
+    border-radius: 10px;
+    width: 100%;
+    margin-bottom: 12px;
+  }
 
-        .logout {
-          background: #dc2626;
-          color: white;
-          padding: 8px 16px;
-          border-radius: 8px;
-        }
-      `}</style>
+  .btn-primary {
+    background: #2563eb;
+    color: white;
+    padding: 14px;
+    border-radius: 10px;
+    width: 100%;
+  }
+
+  .issue-card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+
+  .dark .issue-card {
+    background: #020617;
+    border: 1px solid #1e293b;
+  }
+
+  .issue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .issue-desc {
+    margin: 10px 0;
+    color: #6b7280;
+  }
+
+  .dark .issue-desc {
+    color: #94a3b8;
+  }
+
+  .pill {
+    background: #e0e7ff;
+    color: #1d4ed8;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 640px) {
+    .coords {
+      flex-direction: column;
+    }
+  }
+`}</style>
+
     </div>
   );
 }
