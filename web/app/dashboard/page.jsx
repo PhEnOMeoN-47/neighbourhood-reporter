@@ -282,8 +282,11 @@ export default function Dashboard() {
 
     <div className="issue-meta">
       <span>Problem: {r.category}</span>
-      <span>📍 {r.latitude?.toFixed(4)}, {r.longitude?.toFixed(4)}</span>
-      <span>📅 {new Date(r.createdAt).toLocaleDateString()}</span>
+      {r.latitude && r.longitude && (
+  <span>📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}</span>
+)}
+
+      <span>📅 {new Date(r.created_at).toLocaleDateString()}</span>
     </div>
   {/*
     {isAdmin && (
