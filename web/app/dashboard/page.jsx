@@ -44,6 +44,7 @@ export default function Dashboard() {
   const [category, setCategory] = useState("Pothole");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [problem, setProblem] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const isAdmin = user?.email === "anshul2004ak@gmail.com";
@@ -100,6 +101,7 @@ export default function Dashboard() {
           title,
           description,
           category,
+          problem,
           latitude: Number(latitude),
           longitude: Number(longitude),
         }),
@@ -114,6 +116,7 @@ export default function Dashboard() {
     setDescription("");
     setLatitude("");
     setLongitude("");
+    setProblem("");
   }
 
   async function handleStatusChange(id, status) {
@@ -210,6 +213,14 @@ export default function Dashboard() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+            <label>Problem</label>
+            <input
+              className="input"
+              value={problem}
+              onChange={(e) => setProblem(e.target.value)}
+              placeholder="e.g. Street Lighting"
+            />
+
 
             <label>Category</label>
             <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
@@ -270,7 +281,7 @@ export default function Dashboard() {
     <p className="issue-desc">{r.description}</p>
 
     <div className="issue-meta">
-      <span>Problem: {r.category}</span>
+      <span>Problem: {r.problem}</span>
       <span>📍 {r.latitude?.toFixed(4)}, {r.longitude?.toFixed(4)}</span>
       <span>📅 {new Date(r.created_at).toLocaleDateString()}</span>
     </div>
@@ -407,52 +418,6 @@ export default function Dashboard() {
         .dark .issue-desc {
           color: #94a3b8;
         }
-          .issue-card {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 20px;
-  border: 1px solid #e5e7eb;
-}
-
-.dark .issue-card {
-  background: #020617;
-  border-color: #1e293b;
-}
-
-.issue-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.issue-title {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.category-pill {
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: #dbeafe;
-  color: #1d4ed8;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.issue-meta {
-  display: flex;
-  gap: 16px;
-  font-size: 13px;
-  color: #6b7280;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
-
-.dark .issue-meta {
-  color: #94a3b8;
-}
-
 .coords {
   display: flex;
   gap: 16px;
