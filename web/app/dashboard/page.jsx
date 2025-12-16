@@ -275,6 +275,7 @@ export default function Dashboard() {
         .page {
           min-height: 100vh;
           background: #f8fafc;
+          color: #000000; /* FIX: black text in light mode */
         }
 
         .dark {
@@ -308,7 +309,23 @@ export default function Dashboard() {
         }
 
         .email {
-          color: #6b7280;
+          color: #000000; /* FIX: visible in light mode */
+        }
+
+        .dark .email {
+          color: #94a3b8;
+        }
+
+        .logout {
+          background: #dc2626; /* FIX: red logout button */
+          color: white;
+          padding: 10px 16px;
+          border-radius: 10px;
+          font-weight: 600;
+        }
+
+        .logout:hover {
+          background: #b91c1c;
         }
 
         .main {
@@ -352,6 +369,7 @@ export default function Dashboard() {
           border-radius: 10px;
           border: 1px solid #d1d5db;
           margin-bottom: 16px;
+          color: #000000; /* FIX: input text black in light mode */
         }
 
         .dark .input,
@@ -361,63 +379,13 @@ export default function Dashboard() {
           border-color: #334155;
         }
 
-        .coords {
-          display: flex;
-          gap: 16px;
-        }
-
-        .btn-secondary {
-          background: #4b5563;
-          color: white;
-          padding: 14px;
-          border-radius: 10px;
-          width: 100%;
-          margin-bottom: 12px;
-        }
-
-        .btn-primary {
-          background: #2563eb;
-          color: white;
-          padding: 14px;
-          border-radius: 10px;
-          width: 100%;
-        }
-
-        .issue-card {
-          background: white;
-          border-radius: 14px;
-          padding: 20px;
-          margin-bottom: 20px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-        }
-
-        .dark .issue-card {
-          background: #020617;
-          border: 1px solid #1e293b;
-        }
-
-        .issue-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
         .issue-desc {
           margin: 10px 0;
-          color: #6b7280;
+          color: #000000; /* FIX: visible description text */
         }
 
         .dark .issue-desc {
           color: #94a3b8;
-        }
-
-        .pill {
-          background: #e0e7ff;
-          color: #1d4ed8;
-          padding: 4px 10px;
-          border-radius: 999px;
-          font-size: 12px;
-          font-weight: 500;
         }
 
         @media (max-width: 640px) {
