@@ -48,13 +48,11 @@ export default function Dashboard() {
 
   const isAdmin = user?.email === "anshul2004ak@gmail.com";
 
-  // Load theme
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved) setTheme(saved);
   }, []);
 
-  // Load user + reports
   useEffect(() => {
     async function load() {
       const me = await fetch(
@@ -143,8 +141,8 @@ export default function Dashboard() {
       : reports.filter((r) => r.category === selectedCategory);
 
   return (
-    <div className={theme}>
-      <header>
+    <div className={`page ${theme}`}>
+      <header className="header">
         <h1>Problem Reporting Dashboard</h1>
 
         <div className="header-actions">
@@ -156,14 +154,12 @@ export default function Dashboard() {
               localStorage.setItem("theme", next);
             }}
           >
-            <span className="icon">
-              {theme === "light" ? "🌙" : "☀️"}
-            </span>
+            {theme === "light" ? "🌙" : "☀️"}
           </button>
 
-          <div style={{ textAlign: "right", fontSize: 14 }}>
+          <div className="user-info">
             <div>{user.email.split("@")[0]}</div>
-            <div>{user.email}</div>
+            <div className="email">{user.email}</div>
           </div>
 
           <button
@@ -181,220 +177,261 @@ export default function Dashboard() {
       </header>
 
       <main className="main">
-  <div className="card map-card">
-    <MapView reports={filtered} />
-  </div>
-
-  <div className="card">
-    <h3 className="section-title">Filter by Category</h3>
-    <select
-      className="input"
-      value={selectedCategory}
-      onChange={(e) => setSelectedCategory(e.target.value)}
-    >
-      <option value="All">Select a category</option>
-      <option>Pothole</option>
-      <option>Garbage</option>
-      <option>Streetlight</option>
-      <option>Safety</option>
-      <option>Noise</option>
-    </select>
-  </div>
-
-  <div className="card">
-    <h2 className="section-title">Report an Issue</h2>
-
-    <form onSubmit={handleSubmit} className="form">
-      <label>Title</label>
-      <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} />
-
-      <label>Description</label>
-      <textarea
-        className="textarea"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-
-      <label>Category</label>
-      <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option>Pothole</option>
-        <option>Garbage</option>
-        <option>Streetlight</option>
-        <option>Safety</option>
-        <option>Noise</option>
-      </select>
-
-      <div className="coords">
-        <div>
-          <label>Latitude</label>
-          <input className="input" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+        <div className="card map-card">
+          <MapView reports={filtered} />
         </div>
-        <div>
-          <label>Longitude</label>
-          <input className="input" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
+
+        <div className="card">
+          <h3 className="section-title">Filter by Category</h3>
+          <select
+            className="input"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <option value="All">Select a category</option>
+            <option>Pothole</option>
+            <option>Garbage</option>
+            <option>Streetlight</option>
+            <option>Safety</option>
+            <option>Noise</option>
+          </select>
         </div>
-      </div>
 
-      <button type="button" className="btn-secondary" onClick={handleUseMyLocation}>
-        📍 Use My Location
-      </button>
+        <div className="card">
+          <h2 className="section-title">Report an Issue</h2>
 
-      <button disabled={submitting} className="btn-primary">
-        Submit Report
-      </button>
-    </form>
-  </div>
+          <form onSubmit={handleSubmit} className="form">
+            <label>Title</label>
+            <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} />
 
-  <h2 className="section-title">Reported Issues</h2>
+            <label>Description</label>
+            <textarea
+              className="textarea"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
 
-  {filtered.map((r) => (
-    <div key={r.id} className="issue-card">
-      <div className="issue-header">
-        <strong>{r.title}</strong>
-        <StatusBadge status={r.status} />
-      </div>
+            <label>Category</label>
+            <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
+              <option>Pothole</option>
+              <option>Garbage</option>
+              <option>Streetlight</option>
+              <option>Safety</option>
+              <option>Noise</option>
+            </select>
 
-      <p className="issue-desc">{r.description}</p>
+            <div className="coords">
+              <div>
+                <label>Latitude</label>
+                <input className="input" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+              </div>
+              <div>
+                <label>Longitude</label>
+                <input className="input" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
+              </div>
+            </div>
 
-      <div className="issue-footer">
-        <span className="pill">{r.category}</span>
-      </div>
+            <button type="button" className="btn-secondary" onClick={handleUseMyLocation}>
+              Use My Location
+            </button>
 
-      {isAdmin && (
-        <select
-          className="input"
-          value={r.status}
-          onChange={(e) => handleStatusChange(r.id, e.target.value)}
-        >
-          <option value="open">Open</option>
-          <option value="in-progress">In Progress</option>
-          <option value="resolved">Resolved</option>
-        </select>
-      )}
-    </div>
-  ))}
-</main>
+            <button disabled={submitting} className="btn-primary">
+              Submit Report
+            </button>
+          </form>
+        </div>
 
+        <h2 className="section-title">Reported Issues</h2>
 
-      {/* STYLES */}
+        {filtered.map((r) => (
+          <div key={r.id} className="issue-card">
+            <div className="issue-header">
+              <strong>{r.title}</strong>
+              <StatusBadge status={r.status} />
+            </div>
+
+            <p className="issue-desc">{r.description}</p>
+
+            <div className="issue-footer">
+              <span className="pill">{r.category}</span>
+            </div>
+
+            {isAdmin && (
+              <select
+                className="input"
+                value={r.status}
+                onChange={(e) => handleStatusChange(r.id, e.target.value)}
+              >
+                <option value="open">Open</option>
+                <option value="in-progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            )}
+          </div>
+        ))}
+      </main>
+
       <style jsx>{`
-  .main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 32px;
-  }
+        .page {
+          min-height: 100vh;
+          background: #f8fafc;
+        }
 
-  .section-title {
-    margin-bottom: 12px;
-    font-weight: 600;
-  }
+        .dark {
+          background: #020617;
+          color: #f8fafc;
+        }
 
-  .card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 28px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-  }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px 32px;
+          background: white;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
 
-  .dark .card {
-    background: #020617;
-    border: 1px solid #1e293b;
-  }
+        .dark .header {
+          background: #020617;
+          border-bottom: 1px solid #1e293b;
+        }
 
-  .form label {
-    font-size: 14px;
-    margin-bottom: 6px;
-    display: block;
-    font-weight: 500;
-  }
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
 
-  .input,
-  .textarea {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-    margin-bottom: 16px;
-  }
+        .user-info {
+          text-align: right;
+          font-size: 14px;
+        }
 
-  .textarea {
-    min-height: 120px;
-  }
+        .email {
+          color: #6b7280;
+        }
 
-  .dark .input,
-  .dark .textarea {
-    background: #020617;
-    color: #f8fafc;
-    border-color: #334155;
-  }
+        .main {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 32px;
+        }
 
-  .coords {
-    display: flex;
-    gap: 16px;
-  }
+        .map-card {
+          height: 420px;
+          overflow: hidden;
+        }
 
-  .btn-secondary {
-    background: #4b5563;
-    color: white;
-    padding: 14px;
-    border-radius: 10px;
-    width: 100%;
-    margin-bottom: 12px;
-  }
+        .map-card :global(.leaflet-container) {
+          height: 100%;
+          width: 100%;
+        }
 
-  .btn-primary {
-    background: #2563eb;
-    color: white;
-    padding: 14px;
-    border-radius: 10px;
-    width: 100%;
-  }
+        .card {
+          background: white;
+          border-radius: 16px;
+          padding: 24px;
+          margin-bottom: 28px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
 
-  .issue-card {
-    background: white;
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-  }
+        .dark .card {
+          background: #020617;
+          border: 1px solid #1e293b;
+        }
 
-  .dark .issue-card {
-    background: #020617;
-    border: 1px solid #1e293b;
-  }
+        .section-title {
+          margin-bottom: 12px;
+          font-weight: 600;
+        }
 
-  .issue-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+        .input,
+        .textarea {
+          width: 100%;
+          padding: 12px;
+          border-radius: 10px;
+          border: 1px solid #d1d5db;
+          margin-bottom: 16px;
+        }
 
-  .issue-desc {
-    margin: 10px 0;
-    color: #6b7280;
-  }
+        .dark .input,
+        .dark .textarea {
+          background: #020617;
+          color: #f8fafc;
+          border-color: #334155;
+        }
 
-  .dark .issue-desc {
-    color: #94a3b8;
-  }
+        .coords {
+          display: flex;
+          gap: 16px;
+        }
 
-  .pill {
-    background: #e0e7ff;
-    color: #1d4ed8;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 500;
-  }
+        .btn-secondary {
+          background: #4b5563;
+          color: white;
+          padding: 14px;
+          border-radius: 10px;
+          width: 100%;
+          margin-bottom: 12px;
+        }
 
-  @media (max-width: 640px) {
-    .coords {
-      flex-direction: column;
-    }
-  }
-`}</style>
+        .btn-primary {
+          background: #2563eb;
+          color: white;
+          padding: 14px;
+          border-radius: 10px;
+          width: 100%;
+        }
 
+        .issue-card {
+          background: white;
+          border-radius: 14px;
+          padding: 20px;
+          margin-bottom: 20px;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+
+        .dark .issue-card {
+          background: #020617;
+          border: 1px solid #1e293b;
+        }
+
+        .issue-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .issue-desc {
+          margin: 10px 0;
+          color: #6b7280;
+        }
+
+        .dark .issue-desc {
+          color: #94a3b8;
+        }
+
+        .pill {
+          background: #e0e7ff;
+          color: #1d4ed8;
+          padding: 4px 10px;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        @media (max-width: 640px) {
+          .coords {
+            flex-direction: column;
+          }
+
+          .header {
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+          }
+        }
+      `}</style>
     </div>
   );
 }
