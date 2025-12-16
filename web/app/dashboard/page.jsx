@@ -261,31 +261,34 @@ export default function Dashboard() {
         <h2 className="section-title">Reported Issues</h2>
 
         {filtered.map((r) => (
-          <div key={r.id} className="issue-card">
-            <div className="issue-header">
-              <strong>{r.title}</strong>
-              <StatusBadge status={r.status} />
-            </div>
+  <div key={r.id} className="issue-card">
+    <div className="issue-top">
+      <h3 className="issue-title">{r.title}</h3>
+      <span className="category-pill">{r.category}</span>
+    </div>
 
-            <p className="issue-desc">{r.description}</p>
+    <p className="issue-desc">{r.description}</p>
 
-            <div className="issue-footer">
-              <span className="pill">{r.category}</span>
-            </div>
+    <div className="issue-meta">
+      <span>Problem: {r.category}</span>
+      <span>📍 {r.latitude?.toFixed(4)}, {r.longitude?.toFixed(4)}</span>
+      <span>📅 {new Date(r.created_at).toLocaleDateString()}</span>
+    </div>
 
-            {isAdmin && (
-              <select
-                className="input"
-                value={r.status}
-                onChange={(e) => handleStatusChange(r.id, e.target.value)}
-              >
-                <option value="open">Open</option>
-                <option value="in-progress">In Progress</option>
-                <option value="resolved">Resolved</option>
-              </select>
-            )}
-          </div>
-        ))}
+    {isAdmin && (
+      <select
+        className="input"
+        value={r.status}
+        onChange={(e) => handleStatusChange(r.id, e.target.value)}
+      >
+        <option value="open">Open</option>
+        <option value="in-progress">In Progress</option>
+        <option value="resolved">Resolved</option>
+      </select>
+    )}
+  </div>
+))}
+
       </main>
 
       <style jsx>{`
@@ -404,6 +407,52 @@ export default function Dashboard() {
         .dark .issue-desc {
           color: #94a3b8;
         }
+          .issue-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .issue-card {
+  background: #020617;
+  border-color: #1e293b;
+}
+
+.issue-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.issue-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.category-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.issue-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.dark .issue-meta {
+  color: #94a3b8;
+}
+
 .coords {
   display: flex;
   gap: 16px;
