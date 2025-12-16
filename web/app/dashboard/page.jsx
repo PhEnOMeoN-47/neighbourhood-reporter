@@ -404,18 +404,7 @@ export default function Dashboard() {
         .dark .issue-desc {
           color: #94a3b8;
         }
-
-        @media (max-width: 640px) {
-          .coords {
-            flex-direction: column;
-          }
-
-          .header {
-            flex-direction: column;
-            gap: 12px;
-            align-items: flex-start;
-          }
-          .coords {
+.coords {
   display: flex;
   gap: 16px;
   margin-bottom: 16px;
@@ -453,6 +442,17 @@ export default function Dashboard() {
   opacity: 0.6;
 }
 
+        @media (max-width: 640px) {
+          .coords {
+            flex-direction: column;
+          }
+
+          .header {
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+          }
+          
         }
       `}</style>
     </div>
