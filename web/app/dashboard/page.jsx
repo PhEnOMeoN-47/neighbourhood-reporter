@@ -221,23 +221,40 @@ export default function Dashboard() {
             </select>
 
             <div className="coords">
-              <div>
-                <label>Latitude</label>
-                <input className="input" value={latitude} onChange={(e) => setLatitude(e.target.value)} />
-              </div>
-              <div>
-                <label>Longitude</label>
-                <input className="input" value={longitude} onChange={(e) => setLongitude(e.target.value)} />
-              </div>
-            </div>
+  <div>
+    <label>Latitude</label>
+    <input
+      className="input"
+      value={latitude}
+      onChange={(e) => setLatitude(e.target.value)}
+    />
+  </div>
 
-            <button type="button" className="btn-secondary" onClick={handleUseMyLocation}>
-              Use My Location
-            </button>
+  <div>
+    <label>Longitude</label>
+    <input
+      className="input"
+      value={longitude}
+      onChange={(e) => setLongitude(e.target.value)}
+    />
+  </div>
+</div>
 
-            <button disabled={submitting} className="btn-primary">
-              Submit Report
-            </button>
+<button
+  type="button"
+  className="btn-location"
+  onClick={handleUseMyLocation}
+>
+  Use My Location
+</button>
+
+<button
+  disabled={submitting}
+  className="btn-submit"
+>
+  Submit Report
+</button>
+
           </form>
         </div>
 
@@ -398,6 +415,44 @@ export default function Dashboard() {
             gap: 12px;
             align-items: flex-start;
           }
+          .coords {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.coords > div {
+  flex: 1;
+}
+
+.btn-location {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: #4b5563;
+  color: white;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.btn-location:hover {
+  background: #374151;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+}
+
         }
       `}</style>
     </div>
