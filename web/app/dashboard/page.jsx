@@ -281,11 +281,11 @@ export default function Dashboard() {
     <p className="issue-desc">{r.description}</p>
 
     <div className="issue-meta">
-      <span>Problem: {r.problem}</span>
+      <span>Problem: {r.category}</span>
       <span>📍 {r.latitude?.toFixed(4)}, {r.longitude?.toFixed(4)}</span>
-      <span>📅 {new Date(r.created_at).toLocaleDateString()}</span>
+      <span>📅 {new Date(r.createdAt).toLocaleDateString()}</span>
     </div>
-
+  {/*
     {isAdmin && (
       <select
         className="input"
@@ -297,6 +297,7 @@ export default function Dashboard() {
         <option value="resolved">Resolved</option>
       </select>
     )}
+  */}
   </div>
 ))}
 
