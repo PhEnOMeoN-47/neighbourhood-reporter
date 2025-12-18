@@ -6,8 +6,8 @@ Reported issues are displayed on an interactive map, making them easy to visuali
 
 ## Live Demo
 
-- Frontend: To be added after deployment
-- Backend API: To be added after deployment
+- Frontend (vercel): [https://neighbourhood-reporter.vercel.app](https://neighbourhood-reporter.vercel.app)
+- Backend API (render): [https://neighbourhood-reporter-api.onrender.com](https://neighbourhood-reporter-api.onrender.com)
 
 ## Features
 
