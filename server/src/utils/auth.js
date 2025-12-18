@@ -1,7 +1,8 @@
+const db = require("../db/database");
 const jwt = require("jsonwebtoken");
 
 
-function verifyJwt(req, res, next) {
+async function verifyJwt(req, res, next) {
   const token = req.cookies?.token;
 
   if (!token) {
@@ -11,6 +12,14 @@ function verifyJwt(req, res, next) {
   try {
     const user = jwt.verify(token, process.env.JWT_SECRET);
     req.user = user;
+    await db.query(
+      `
+      INSERT INTO users (id, email)
+      VALUES ($1, $2)
+      ON CONFLICT (id) DO NOTHING
+      `,
+      [user.id, user.email]
+    );
     next();
   } catch (err) {
     return res.status(401).json({ error: "Invalid token" });
