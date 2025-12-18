@@ -14,12 +14,18 @@ router.post("/", verifyJwt, async (req, res) => {
         .status(400)
         .json({ error: "Title and category are required" });
     }
+    const lat = latitude ? Number(latitude) : null;
+    const lng = longitude ? Number(longitude) : null;
+
+    if ((lat && isNaN(lat)) || (lng && isNaN(lng))) {
+      return res.status(400).json({ error: "Invalid coordinates" });
+    }
 
     const result = await db.query(
       `
       INSERT INTO reports 
-      (user_id, title, description, category,problem, latitude, longitude)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      (user_id, title, description, category,problem, latitude, longitude, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, 'open')
       RETURNING *
       `,
       [
