@@ -285,9 +285,12 @@ export default function Dashboard() {
 
     {/* Meta info */}
     <div className="issue-meta">
-      {r.latitude && r.longitude && (
-        <span>📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}</span>
-      )}
+      {r.latitude != null && r.longitude != null && (
+  <span>
+    📍 {Number(r.latitude).toFixed(4)}, {Number(r.longitude).toFixed(4)}
+  </span>
+)}
+
 
       <span>
         📅 {r.created_at
