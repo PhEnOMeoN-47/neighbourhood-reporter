@@ -430,6 +430,64 @@ export default function Dashboard() {
         .dark .issue-desc {
           color: #94a3b8;
         }
+        .issue-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.dark .issue-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+}
+
+.issue-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.issue-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.dark .issue-title {
+  color: #f8fafc;
+}
+
+.category-pill {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.issue-desc {
+  margin: 10px 0;
+  color: #374151;
+}
+
+.dark .issue-desc {
+  color: #94a3b8;
+}
+
+.issue-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.dark .issue-meta {
+  color: #94a3b8;
+}
+
 .coords {
   display: flex;
   gap: 16px;
