@@ -273,22 +273,30 @@ export default function Dashboard() {
 
         {filtered.map((r) => (
   <div key={r.id} className="issue-card">
+    
+    {/* Title + Category */}
     <div className="issue-top">
       <h3 className="issue-title">{r.title}</h3>
       <span className="category-pill">{r.category}</span>
     </div>
 
+    {/* Description */}
     <p className="issue-desc">{r.description}</p>
 
+    {/* Meta info */}
     <div className="issue-meta">
-      <span>Problem: {r.category}</span>
       {r.latitude && r.longitude && (
-  <span>📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}</span>
-)}
+        <span>📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}</span>
+      )}
 
-      <span>📅 {new Date(r.created_at).toLocaleDateString()}</span>
+      <span>
+        📅 {r.created_at
+          ? new Date(r.created_at).toLocaleDateString()
+          : "Just now"}
+      </span>
     </div>
-  {/*
+
+    {/* Admin status control */}
     {isAdmin && (
       <select
         className="input"
@@ -300,9 +308,9 @@ export default function Dashboard() {
         <option value="resolved">Resolved</option>
       </select>
     )}
-  */}
   </div>
 ))}
+
 
       </main>
 
