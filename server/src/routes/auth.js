@@ -36,7 +36,6 @@ router.get(
       httpOnly: true,
       secure: true, 
       sameSite: "None",
-      domain: "neighbourhood-reporter-api.onrender.com",
       path: "/",
     });
 
