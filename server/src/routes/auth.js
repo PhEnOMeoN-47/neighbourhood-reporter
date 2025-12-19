@@ -36,7 +36,6 @@ router.get(
       httpOnly: true,
       secure: true, 
       sameSite: "None",
-      domain: "neighbourhood-reporter.vercel.app",
       path: "/",
     });
 
@@ -71,7 +70,6 @@ router.post("/logout", (req, res) => {
     httpOnly: true,
     secure: true,
     sameSite: "None",
-    domain: "neighbourhood-reporter.vercel.app",
     path: "/",
   });
 
