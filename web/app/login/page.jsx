@@ -1,6 +1,20 @@
 "use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // If already logged in, skip login page
+    if (token) {
+      router.replace("/dashboard");
+    }
+  }, [router]);
   function handleGoogleLogin() {
     window.location.href = "https://neighbourhood-reporter-api.onrender.com/auth/google";
   }
