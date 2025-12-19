@@ -47,27 +47,7 @@ export default function Dashboard() {
   const [problem, setProblem] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-  async function checkAuth() {
-    try {
-      const res = await fetch(
-        "https://neighbourhood-reporter-api.onrender.com/auth/me",
-        {
-          credentials: "include",
-        }
-      );
-
-      if (!res.ok) {
-        router.replace("/login");
-      }
-    } catch {
-      router.replace("/login");
-    }
-  }
-
-  checkAuth();
-}, [router]);
-
+  
   const isAdmin = user?.email === "anshul2004ak@gmail.com";
 
   useEffect(() => {
@@ -76,20 +56,20 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    async function load() {
-      const me = await fetch(
+  async function load() {
+    try {
+      const meRes = await fetch(
         "https://neighbourhood-reporter-api.onrender.com/auth/me",
         { credentials: "include" }
       );
 
-      if (!me.ok) {
-        router.push("/login");
+      if (!meRes.ok) {
+        router.replace("/login");
         return;
       }
 
-      const meData = await me.json();
+      const meData = await meRes.json();
       setUser(meData.user);
-
 
       const reportsRes = await fetch(
         "https://neighbourhood-reporter-api.onrender.com/reports",
@@ -98,10 +78,14 @@ export default function Dashboard() {
 
       setReports(await reportsRes.json());
       setLoading(false);
+    } catch {
+      router.replace("/login");
     }
+  }
 
-    load();
-  }, [router]);
+  load();
+}, [router]);
+
 
   function handleUseMyLocation() {
     navigator.geolocation.getCurrentPosition((pos) => {
