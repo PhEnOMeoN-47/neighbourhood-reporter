@@ -31,7 +31,7 @@ function StatusBadge({ status }) {
 }
 
 export default function Dashboard() {
-  const router = useRouter();
+  
 
   
   const [reports, setReports] = useState([]);
@@ -47,9 +47,25 @@ export default function Dashboard() {
   const [problem, setProblem] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const user = getUserFromCookie();
+  const [user, setUser] = useState(null);
+
   const isAdmin = user?.email === "anshul2004ak@gmail.com";
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+  function getUserFromCookie() {
+    const match = document.cookie.match(/(^| )token=([^;]+)/);
+    if (!match) return null;
+
+    try {
+      return JSON.parse(atob(match[2].split(".")[1]));
+    } catch {
+      return null;
+    }
+  }
+
+  setUser(getUserFromCookie());
+}, []);
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -81,16 +97,7 @@ export default function Dashboard() {
 }, []);
 
 
-  function getUserFromCookie() {
-  const match = document.cookie.match(/(^| )token=([^;]+)/);
-  if (!match) return null;
-
-  try {
-    return JSON.parse(atob(match[2].split(".")[1]));
-  } catch {
-    return null;
-  }
-}
+  
 
 
 
