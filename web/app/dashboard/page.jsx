@@ -132,6 +132,7 @@ export default function Dashboard() {
       {
         method: "POST",
         credentials: "include",
+        cache: "no-store",
       }
     );
   } catch (err) {
