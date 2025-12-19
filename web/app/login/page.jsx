@@ -7,26 +7,7 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const router = useRouter();
 
-  useEffect(() => {
-  async function checkAuth() {
-    try {
-      const res = await fetch(
-        "https://neighbourhood-reporter-api.onrender.com/auth/me",
-        {
-          credentials: "include",
-        }
-      );
-
-      if (res.ok) {
-        router.replace("/dashboard");
-      }
-    } catch (err) {
-      // not logged in → stay on login page
-    }
-  }
-
-  checkAuth();
-}, [router]);
+  
 
   function handleGoogleLogin() {
     window.location.href = "https://neighbourhood-reporter-api.onrender.com/auth/google";
