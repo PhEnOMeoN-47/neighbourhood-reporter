@@ -87,7 +87,9 @@ export default function Dashboard() {
         return;
       }
 
-      setUser(await me.json());
+      const meData = await me.json();
+      setUser(meData.user);
+
 
       const reportsRes = await fetch(
         "https://neighbourhood-reporter-api.onrender.com/reports",
