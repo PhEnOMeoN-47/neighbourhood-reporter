@@ -6,8 +6,8 @@ const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
-const app = express();              // ✅ app must be created FIRST
-app.set("trust proxy", 1);          // ✅ then trusted
+const app = express();              
+app.set("trust proxy", 1);          
 
 app.use(
   cors({

@@ -8,13 +8,26 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+  async function checkAuth() {
+    try {
+      const res = await fetch(
+        "https://neighbourhood-reporter-api.onrender.com/auth/me",
+        {
+          credentials: "include",
+        }
+      );
 
-    // If already logged in, skip login page
-    if (token) {
-      router.replace("/dashboard");
+      if (res.ok) {
+        router.replace("/dashboard");
+      }
+    } catch (err) {
+      // not logged in → stay on login page
     }
-  }, [router]);
+  }
+
+  checkAuth();
+}, [router]);
+
   function handleGoogleLogin() {
     window.location.href = "https://neighbourhood-reporter-api.onrender.com/auth/google";
   }

@@ -47,6 +47,27 @@ export default function Dashboard() {
   const [problem, setProblem] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  useEffect(() => {
+  async function checkAuth() {
+    try {
+      const res = await fetch(
+        "https://neighbourhood-reporter-api.onrender.com/auth/me",
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!res.ok) {
+        router.replace("/login");
+      }
+    } catch {
+      router.replace("/login");
+    }
+  }
+
+  checkAuth();
+}, [router]);
+
   const isAdmin = user?.email === "anshul2004ak@gmail.com";
 
   useEffect(() => {
@@ -57,7 +78,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function load() {
       const me = await fetch(
-        "https://neighbourhood-reporter-api.onrender.com/me",
+        "https://neighbourhood-reporter-api.onrender.com/auth/me",
         { credentials: "include" }
       );
 
