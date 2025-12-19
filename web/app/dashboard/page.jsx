@@ -181,10 +181,13 @@ export default function Dashboard() {
             {theme === "light" ? "🌙" : "☀️"}
           </button>
 
-          <div className="user-info">
-            <div>{user.email.split("@")[0]}</div>
-            <div className="email">{user.email}</div>
-          </div>
+          {user && (
+  <div className="user-info">
+    <div>{user.email.split("@")[0]}</div>
+    <div className="email">{user.email}</div>
+  </div>
+)}
+
 
           <button
             className="logout"
