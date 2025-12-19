@@ -36,6 +36,7 @@ router.get(
       httpOnly: true,
       secure: true, 
       sameSite: "None",
+      domain: "neighbourhood-reporter.vercel.app",
       path: "/",
     });
 
