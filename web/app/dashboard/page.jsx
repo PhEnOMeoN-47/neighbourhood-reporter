@@ -125,23 +125,21 @@ export default function Dashboard() {
     setLongitude("");
     setProblem("");
   }
-  async function handleLogout() {
-  try {
-    await fetch(
-      "https://neighbourhood-reporter-api.onrender.com/auth/logout",
-      {
-        method: "POST",
-        credentials: "include",
-        cache: "no-store",
-      }
-    );
-  } catch (err) {
-    console.error("Logout failed", err);
-  }
+  function handleLogout() {
+  // Delete root cookie
+  document.cookie =
+    "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; Secure; SameSite=None";
 
-  // IMPORTANT: force full reload
-  window.location.href = "/login";
+  // Delete any path-scoped leftovers (extra safety)
+  document.cookie =
+    "token=; path=/dashboard; expires=Thu, 01 Jan 1970 00:00:00 UTC; Secure; SameSite=None";
+
+  document.cookie =
+    "token=; path=/auth; expires=Thu, 01 Jan 1970 00:00:00 UTC; Secure; SameSite=None";
+
+  window.location.replace("/login");
 }
+
 
   async function handleStatusChange(id, status) {
     const res = await fetch(
