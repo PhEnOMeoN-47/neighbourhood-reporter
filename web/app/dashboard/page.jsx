@@ -139,6 +139,22 @@ export default function Dashboard() {
     setLongitude("");
     setProblem("");
   }
+  async function handleLogout() {
+  try {
+    await fetch(
+      "https://neighbourhood-reporter-api.onrender.com/auth/logout",
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+  } catch (err) {
+    console.error("Logout failed", err);
+  }
+
+  // IMPORTANT: force full reload
+  window.location.href = "/login";
+}
 
   async function handleStatusChange(id, status) {
     const res = await fetch(
@@ -189,17 +205,10 @@ export default function Dashboard() {
 )}
 
 
-          <button
-            className="logout"
-            onClick={() =>
-              fetch(
-                "https://neighbourhood-reporter-api.onrender.com/auth/logout",
-                { method: "POST", credentials: "include" }
-              ).then(() => router.push("/login"))
-            }
-          >
-            Logout
-          </button>
+          <button className="logout" onClick={handleLogout}>
+  Logout
+</button>
+
         </div>
       </header>
 
