@@ -15,7 +15,7 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
-export default function MapView({ reports }) {
+export default function MapView({ reports = [] }) {
   return (
     <>
       <MapContainer
