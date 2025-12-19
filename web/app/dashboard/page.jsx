@@ -33,9 +33,9 @@ function StatusBadge({ status }) {
 export default function Dashboard() {
   const router = useRouter();
 
-  const [user, setUser] = useState(null);
+  
   const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
   const [theme, setTheme] = useState("light");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
@@ -47,8 +47,9 @@ export default function Dashboard() {
   const [problem, setProblem] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  
+  const user = getUserFromCookie();
   const isAdmin = user?.email === "anshul2004ak@gmail.com";
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -56,35 +57,30 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-  async function load() {
-    try {
-      const meRes = await fetch(
-        "https://neighbourhood-reporter-api.onrender.com/auth/me",
-        { credentials: "include" }
-      );
+  async function loadReports() {
+    const res = await fetch(
+      "https://neighbourhood-reporter-api.onrender.com/reports",
+      { credentials: "include" }
+    );
 
-      if (!meRes.ok) {
-        router.replace("/login");
-        return;
-      }
-
-      const meData = await meRes.json();
-      setUser(meData.user);
-
-      const reportsRes = await fetch(
-        "https://neighbourhood-reporter-api.onrender.com/reports",
-        { credentials: "include" }
-      );
-
-      setReports(await reportsRes.json());
-      setLoading(false);
-    } catch {
-      router.replace("/login");
-    }
+    setReports(await res.json());
+    setLoading(false);
   }
 
-  load();
-}, [router]);
+  loadReports();
+}, []);
+
+  function getUserFromCookie() {
+  const match = document.cookie.match(/(^| )token=([^;]+)/);
+  if (!match) return null;
+
+  try {
+    return JSON.parse(atob(match[2].split(".")[1]));
+  } catch {
+    return null;
+  }
+}
+
 
 
   function handleUseMyLocation() {
@@ -158,12 +154,14 @@ export default function Dashboard() {
     );
   }
 
-  if (loading) return <p style={{ padding: 40 }}>Loading…</p>;
+  
 
   const filtered =
     selectedCategory === "All"
       ? reports
       : reports.filter((r) => r.category === selectedCategory);
+
+      if (loading) return <p style={{ padding: 40 }}>Loading…</p>;
 
   return (
     <div className={`page ${theme}`}>
