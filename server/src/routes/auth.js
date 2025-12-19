@@ -32,16 +32,9 @@ router.get(
     );
 
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true, 
-      sameSite: "None",
-      path: "/",
-      domain: ".neighbourhood-reporter.vercel.app",
-    });
-
-
-    return res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+    return res.redirect(
+      `${process.env.FRONTEND_URL}/auth/callback?token=${encodeURIComponent(token)}`
+    );
 
   }
 );
