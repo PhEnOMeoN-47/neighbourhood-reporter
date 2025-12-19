@@ -12,11 +12,13 @@ export default function AuthCallback() {
       return;
     }
 
-    // Store token as cookie on FRONTEND domain
+    // Set cookie
     document.cookie = `token=${token}; path=/; Secure; SameSite=None`;
 
-    // Go to dashboard
-    window.location.replace("/dashboard");
+    // ⏱ Give browser time to persist cookie
+    setTimeout(() => {
+      window.location.href = "/dashboard";
+    }, 100);
   }, []);
 
   return <p>Signing you in…</p>;
