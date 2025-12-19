@@ -58,17 +58,28 @@ export default function Dashboard() {
 
   useEffect(() => {
   async function loadReports() {
-    const res = await fetch(
-      "https://neighbourhood-reporter-api.onrender.com/reports",
-      { credentials: "include" }
-    );
+    try {
+      const res = await fetch(
+        "https://neighbourhood-reporter-api.onrender.com/reports",
+        { credentials: "include" }
+      );
 
-    setReports(await res.json());
-    setLoading(false);
+      if (!res.ok) {
+        console.error("Reports failed:", res.status);
+        return;
+      }
+
+      setReports(await res.json());
+    } catch (e) {
+      console.error("Reports error", e);
+    } finally {
+      setLoading(false); // ✅ ALWAYS RUNS
+    }
   }
 
   loadReports();
 }, []);
+
 
   function getUserFromCookie() {
   const match = document.cookie.match(/(^| )token=([^;]+)/);
