@@ -76,7 +76,7 @@ export default function Dashboard() {
   async function loadReports() {
     try {
       const res = await fetch(
-        "https://neighbourhood-reporter-api.onrender.com/reports",
+        "https://neighbourhood-reporter-production.up.railway.app/reports",
         { credentials: "include" }
       );
 
@@ -113,7 +113,7 @@ export default function Dashboard() {
     setSubmitting(true);
 
     const res = await fetch(
-      "https://neighbourhood-reporter-api.onrender.com/reports",
+      "https://neighbourhood-reporter-production.up.railway.app/reports",
       {
         method: "POST",
         credentials: "include",
@@ -157,7 +157,7 @@ export default function Dashboard() {
 
   async function handleStatusChange(id, status) {
     const res = await fetch(
-      `https://neighbourhood-reporter-api.onrender.com/reports/${id}/status`,
+      `https://neighbourhood-reporter-production.up.railway.app/reports/${id}/status`,
       {
         method: "PATCH",
         credentials: "include",

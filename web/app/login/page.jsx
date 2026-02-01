@@ -10,7 +10,7 @@ export default function LoginPage() {
   
 
   function handleGoogleLogin() {
-    window.location.href = "https://neighbourhood-reporter-api.onrender.com/auth/google";
+    window.location.href = "https://neighbourhood-reporter-production.up.railway.app/auth/google/callback";
   }
 
   return (

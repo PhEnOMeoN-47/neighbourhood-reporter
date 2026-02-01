@@ -7,7 +7,7 @@ Reported issues are displayed on an interactive map, making them easy to visuali
 ## Live Demo
 
 - Frontend (vercel): [https://neighbourhood-reporter.vercel.app](https://neighbourhood-reporter.vercel.app)
-- Backend API (render): [https://neighbourhood-reporter-api.onrender.com](https://neighbourhood-reporter-api.onrender.com)
+- Backend API (railway): [https://neighbourhood-reporter-production.up.railway.app](https://neighbourhood-reporter-production.up.railway.app)
 
 ## Features
 
@@ -79,7 +79,7 @@ Screenshots will be added after deployment.
 
 ### Deployment
 - Vercel (Frontend) 
-- Render (Backend)  
+- Railway (Backend)  
 
 ## Mobile Responsiveness
 
